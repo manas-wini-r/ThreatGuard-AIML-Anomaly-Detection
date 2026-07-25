@@ -1,0 +1,16 @@
+# run this to create sample data
+from app.data.generator import DataGenerator
+from app.data.data_saver import DataSaver
+
+# Generate sample data
+generator = DataGenerator()
+logs = generator.generate_batch(1000, anomaly_rate=0.05)
+
+# Convert to DataFrame
+import pandas as pd
+df = pd.DataFrame(logs)
+
+# Save
+saver = DataSaver()
+saver.save_raw_data(df, "sample_logs.csv")
+saver.save_synthetic_data(df, "mixed_logs.csv")

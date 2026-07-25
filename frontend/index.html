@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThreatGuard - AI Security Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="app">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <div class="logo-text">
+                    <span>ThreatGuard</span>
+                    <small>AI Security</small>
+                </div>
+            </div>
+
+            <nav class="nav">
+                <a href="#" class="active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" data-section="alerts">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Alerts</span>
+                    <span class="badge" id="alertCount">0</span>
+                </a>
+                <a href="#" data-section="threats">
+                    <i class="fas fa-skull"></i>
+                    <span>Threat Intel</span>
+                </a>
+                
+                <a href="#" data-section="models">
+                    <i class="fas fa-brain"></i>
+                    <span>AI Models</span>
+                </a>
+                <a href="#" data-section="logs">
+                    <i class="fas fa-history"></i>
+                    <span>Audit Logs</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status">
+                    <span class="dot"></span> System Online
+                    <span id="uptime" class="uptime">00:00:00</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN ===== -->
+        <main class="main">
+
+            <!-- Header -->
+            <header class="header">
+                <div>
+                    <h1 id="pageTitle">Security Dashboard</h1>
+                    <p class="breadcrumb">Home / <span id="breadcrumbCurrent">Dashboard</span></p>
+                </div>
+                <div class="header-actions">
+                    <div class="search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search logs, users, threats...">
+                        <kbd>⌘K</kbd>
+                    </div>
+                    <button class="btn-icon" id="refreshBtn" title="Refresh">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <div class="user">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=4A6CF7&color=fff&size=32" alt="Admin">
+                        <div>
+                            <div class="user-name">Admin</div>
+                            <div class="user-role">Security Analyst</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
+
+                <!-- ===== DASHBOARD ===== -->
+                <section id="dashboard" class="section active">
+
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue"><i class="fas fa-database"></i></div>
+                            <div>
+                                <div class="stat-label">Total Logs</div>
+                                <div class="stat-value" id="totalLogs">0</div>
+                                <div class="stat-change up"><i class="fas fa-arrow-up"></i> 12.5%</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon red"><i class="fas fa-shield"></i></div>
+                            <div>
+                                <div class="stat-label">Threats Detected</div>
+                                <div class="stat-value" id="anomalies">0</div>
+                                <div class="stat-change up"><i class="fas fa-arrow-up"></i> 5.2%</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon yellow"><i class="fas fa-flag"></i></div>
+                            <div>
+                                <div class="stat-label">Active Alerts</div>
+                                <div class="stat-value" id="activeAlerts">0</div>
+                                <div class="stat-change down"><i class="fas fa-arrow-down"></i> 2.1%</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="fas fa-robot"></i></div>
+                            <div>
+                                <div class="stat-label">Model Accuracy</div>
+                                <div class="stat-value" id="modelAccuracy">94.2%</div>
+                                <div class="stat-change up"><i class="fas fa-arrow-up"></i> 0.8%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="charts-row">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Threat Activity Timeline</h3>
+                                <p>Real-time anomaly detection trends</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Threat Distribution</h3>
+                                <p>Attack type breakdown</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="distributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feed -->
+                    <div class="feed-row">
+                        <div class="feed-card">
+                            <div class="feed-header">
+                                <div>
+                                    <i class="fas fa-bolt" style="color:#ef4444;"></i>
+                                    <span>Live Threat Feed</span>
+                                    <span class="live-badge">● LIVE</span>
+                                </div>
+                                <button class="btn btn-primary btn-sm" onclick="viewAllAlerts()">View All</button>
+                            </div>
+                            <div class="feed-container" id="liveFeed">
+                                <div class="empty-state">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <p>No threats detected</p>
+                                    <span>All systems secure</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feed-card">
+                            <div class="feed-header">
+                                <div>
+                                    <i class="fas fa-clock"></i>
+                                    <span>Recent Alerts</span>
+                                </div>
+                            </div>
+                            <div class="feed-container" id="recentAlertsList">
+                                <div class="empty-state">
+                                    <i class="fas fa-check-circle" style="color:#10b981;"></i>
+                                    <p>All clear</p>
+                                    <span>No recent alerts</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- ===== ALERTS ===== -->
+                <section id="alerts" class="section">
+                    <div class="section-header">
+                        <h2>Security Alerts</h2>
+                        <p>Monitor and manage all security alerts</p>
+                    </div>
+
+                    <div class="filters">
+                        <select id="severityFilter">
+                            <option value="all">All Severities</option>
+                            <option value="critical">Critical</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                        <select id="threatFilter">
+                            <option value="all">All Threats</option>
+                            <option value="brute_force">Brute Force</option>
+                            <option value="impossible_travel">Impossible Travel</option>
+                            <option value="lateral_movement">Lateral Movement</option>
+                            <option value="credential_misuse">Credential Misuse</option>
+                            <option value="device_spoofing">Device Spoofing</option>
+                        </select>
+                        <button class="btn btn-primary" id="applyFilters">Apply</button>
+                        <button class="btn btn-outline" id="resetFilters">Reset</button>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Alert ID</th>
+                                    <th>Time</th>
+                                    <th>Threat Type</th>
+                                    <th>Severity</th>
+                                    <th>Risk Score</th>
+                                    <th>User</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alertsTableBody">
+                                <tr><td colspan="8" class="empty-state">No alerts found</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ===== THREATS ===== -->
+                <section id="threats" class="section">
+                    <div class="section-header">
+                        <h2>Threat Intelligence</h2>
+                        <p>Detailed information about detected threat types</p>
+                    </div>
+                    <div class="threats-grid" id="threatsGrid"></div>
+                </section>
+
+                
+
+                <!-- ===== MODELS ===== -->
+                <section id="models" class="section">
+                    <div class="section-header">
+                        <h2>AI Model Management</h2>
+                        <p>Monitor and manage your ML models</p>
+                    </div>
+                    <div class="models-grid" id="modelsGrid"></div>
+                </section>
+
+                <!-- ===== LOGS ===== -->
+                <section id="logs" class="section">
+                    <div class="section-header">
+                        <h2>Audit Logs</h2>
+                        <p>Complete audit trail of all system events</p>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Event</th>
+                                    <th>User</th>
+                                    <th>Source</th>
+                                    <th>Details</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsTableBody">
+                                <tr><td colspan="6" class="empty-state">No logs found</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
