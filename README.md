@@ -263,23 +263,12 @@ Trained artifacts are saved to `ml_models/trained/` (Isolation Forest, Autoencod
 
 
 ## 📸 Screenshots
-
-| Dashboard | Alerts |
-|-----------|--------|
-| ![Dashboard](screenshots/01-dashboard.png) | ![Alerts](screenshots/02-alerts.png) |
-
-| Threat Intel | Models |
-|--------------|--------|
-| ![Threats](screenshots/03-threats.png) | ![Models](screenshots/04-models.png) |
-
-| Live Feed | Alert Modal |
-|-----------|-------------|
-| ![Live Feed](screenshots/05-live-feed.png) | ![Alert Modal](screenshots/06-alert-modal.png) |
-
-| Backend Logs |
-|--------------|
-| ![Logs](screenshots/07-backend-logs.png) |
-
+- dashboard.png
+- alerts.png
+- models.png
+- threats.png
+- action.png
+- audit_logs.png
 
 
 ## 🔗 Links
