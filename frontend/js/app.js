@@ -15,6 +15,10 @@ document.querySelectorAll('.nav a').forEach(link => {
         document.getElementById(section).classList.add('active');
         document.getElementById('pageTitle').textContent = this.textContent.trim();
         document.getElementById('breadcrumbCurrent').textContent = this.textContent.trim();
+        
+        if (section === 'alerts') {
+            loadAlerts();
+        }
     });
 });
 
@@ -356,16 +360,63 @@ document.getElementById('resetFilters')?.addEventListener('click', () => {
     loadAlerts();
 });
 
-// Search
-document.getElementById('searchInput')?.addEventListener('keyup', function(e) {
-    if (e.key === 'Enter') {
-        const q = this.value.toLowerCase();
-        if (!q) return;
-        document.querySelectorAll('.alerts-table tbody tr').forEach(row => {
-            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-        });
-    }
-});
+// ============================================================
+// ===== SEARCH BAR - FIXED =====
+// ============================================================
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+    searchInput.addEventListener('keyup', function(e) {
+        const query = this.value.toLowerCase().trim();
+        
+        // If Enter key pressed OR query has 3+ characters
+        if (e.key === 'Enter' || query.length >= 3) {
+            // Navigate to alerts tab if not already there
+            if (!document.getElementById('alerts').classList.contains('active')) {
+                document.querySelectorAll('.nav a').forEach(l => l.classList.remove('active'));
+                const alertsLink = document.querySelector('[data-section="alerts"]');
+                if (alertsLink) {
+                    alertsLink.classList.add('active');
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                    document.getElementById('alerts').classList.add('active');
+                    document.getElementById('pageTitle').textContent = 'Security Alerts';
+                    document.getElementById('breadcrumbCurrent').textContent = 'Security Alerts';
+                    loadAlerts();
+                }
+            }
+            
+            // Filter alerts after loading
+            setTimeout(() => {
+                const rows = document.querySelectorAll('#alertsTableBody tr');
+                let found = 0;
+                rows.forEach(row => {
+                    // Skip empty state row
+                    if (row.querySelector('.empty-state')) {
+                        row.style.display = '';
+                        return;
+                    }
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(query)) {
+                        row.style.display = '';
+                        found++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                console.log('🔍 Found ' + found + ' results for "' + query + '"');
+            }, 400);
+        }
+        
+        // If empty, reload alerts
+        if (query === '') {
+            if (document.getElementById('alerts').classList.contains('active')) {
+                loadAlerts();
+            }
+        }
+    });
+    console.log('✅ Search bar initialized!');
+} else {
+    console.log('❌ Search input not found!');
+}
 
 // ===== MAKE GLOBAL =====
 window.viewAlert = viewAlert;
