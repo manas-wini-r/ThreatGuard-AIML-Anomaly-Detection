@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class DataLoader:
-    """Load data from various sources"""
+    """Load data from various sources with schema support"""
     
     def __init__(self, data_dir: str = "data"):
         self.data_dir = Path(data_dir)
@@ -18,7 +18,6 @@ class DataLoader:
         self.synthetic_dir = self.data_dir / "synthetic"
         self.cache_dir = self.data_dir / "cache"
         
-        # Create directories if they don't exist
         for dir_path in [self.raw_dir, self.processed_dir, self.synthetic_dir, self.cache_dir]:
             dir_path.mkdir(parents=True, exist_ok=True)
     
@@ -109,3 +108,21 @@ class DataLoader:
             return []
         
         return [f.name for f in target_dir.iterdir() if f.is_file()]
+    
+    def validate_schema(self, df: pd.DataFrame) -> Dict[str, Any]:
+        """Validate that DataFrame matches the expected schema"""
+        required_columns = [
+            'entity_id', 'entity_type', 'timestamp', 'source_ip',
+            'geo_location', 'resource_accessed', 'auth_method',
+            'session_duration', 'command_sequence', 'device_fingerprint',
+            'label'
+        ]
+        
+        missing = [col for col in required_columns if col not in df.columns]
+        
+        return {
+            'valid': len(missing) == 0,
+            'missing_columns': missing,
+            'total_columns': len(df.columns),
+            'total_rows': len(df)
+        }

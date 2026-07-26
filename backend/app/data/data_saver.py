@@ -11,7 +11,7 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 class DataSaver:
-    """Save data to various formats"""
+    """Save data to various formats with schema support"""
     
     def __init__(self, data_dir: str = "data"):
         self.data_dir = Path(data_dir)
@@ -21,7 +21,6 @@ class DataSaver:
         self.models_dir = self.data_dir / "models"
         self.cache_dir = self.data_dir / "cache"
         
-        # Create directories if they don't exist
         for dir_path in [self.raw_dir, self.processed_dir, self.synthetic_dir, 
                         self.models_dir, self.cache_dir]:
             dir_path.mkdir(parents=True, exist_ok=True)
@@ -95,3 +94,13 @@ class DataSaver:
         """Save training metadata"""
         metadata['timestamp'] = datetime.now().isoformat()
         return self.save_json(metadata, "models/training_metadata.json")
+    
+    def save_schema_info(self, df: pd.DataFrame, filename: str = "schema_info.json") -> bool:
+        """Save schema information"""
+        schema_info = {
+            'columns': list(df.columns),
+            'dtypes': df.dtypes.astype(str).to_dict(),
+            'row_count': len(df),
+            'timestamp': datetime.now().isoformat()
+        }
+        return self.save_json(schema_info, f"processed/{filename}")
